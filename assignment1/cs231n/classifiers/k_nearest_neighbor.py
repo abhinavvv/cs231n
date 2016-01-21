@@ -111,18 +111,19 @@ class KNearestNeighbor(object):
 
     Input / Output: Same as compute_distances_two_loops
     """
-    num_test = X.shape[0]
-    num_train = self.X_train.shape[0]
-    dists = np.zeros((num_test, num_train))
-    print dists.shape
-    print sys.getsizeof(self.X_train)
-    print sys.getsizeof(X) 
-    
-    x_totrain  = self.X_train[:,newaxis]
-    print x_totrain.shape,X.shape
-    sys.exit(0)
-    inter = np.subtract(X,x_totrain)
-    dists = np.transpose(np.sqrt(np.sum(np.square(inter),axis=2)))
+    print "Initial dimensions"
+    print "Test data dimension :", X.shape
+    print "Train data diminesions : ", self.X_train.shape
+
+    X2 = np.diag(X.dot(X.T))
+    X2 = X2.reshape(X2.shape[0],1)
+    X_train2 = np.diag(self.X_train.dot(self.X_train.T))
+    X_train2 = X_train2.reshape(X_train2.shape[0],1)
+    X2new = X2.dot(np.ones((1,self.X_train.shape[0])))
+    X_train2new = np.ones((X.shape[0],1)).dot(X_train2.T)
+    print "Intermediate Test data dimensions :", X2new.shape
+    print "Intermediate Training dimensions :", X_train2new.shape
+    dists = np.sqrt(X2new + X_train2new - (2 * X.dot(self.X_train.T)))
     #########################################################################
     # TODO:                                                                 #
     # Compute the l2 distance between all test points and all training      #
