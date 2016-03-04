@@ -37,6 +37,9 @@ class LinearClassifier(object):
     for it in xrange(num_iters):
       X_batch = None
       y_batch = None
+      indices = np.random.choice(X.shape[0],batch_size,replace=False)
+      X_batch = X[indices,:]
+      y_batch = y[indices]
 
       #########################################################################
       # TODO:                                                                 #
@@ -49,7 +52,7 @@ class LinearClassifier(object):
       # Hint: Use np.random.choice to generate indices. Sampling with         #
       # replacement is faster than sampling without replacement.              #
       #########################################################################
-      pass
+      # pass
       #########################################################################
       #                       END OF YOUR CODE                                #
       #########################################################################
@@ -63,7 +66,8 @@ class LinearClassifier(object):
       # TODO:                                                                 #
       # Update the weights using the gradient and the learning rate.          #
       #########################################################################
-      pass
+      # pass
+      self.W = self.W -learning_rate * grad
       #########################################################################
       #                       END OF YOUR CODE                                #
       #########################################################################
@@ -91,7 +95,11 @@ class LinearClassifier(object):
     # TODO:                                                                   #
     # Implement this method. Store the predicted labels in y_pred.            #
     ###########################################################################
-    pass
+    # pass
+    scores = X.dot(self.W)
+    print scores.shape
+    y_pred = scores.argmax(axis=1)
+    print y_pred.shape
     ###########################################################################
     #                           END OF YOUR CODE                              #
     ###########################################################################
@@ -112,7 +120,8 @@ class LinearClassifier(object):
     - loss as a single float
     - gradient with respect to self.W; an array of the same shape as W
     """
-    pass
+
+    # pass
 
 
 class LinearSVM(LinearClassifier):

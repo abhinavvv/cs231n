@@ -1,5 +1,6 @@
 import numpy as np
 from random import shuffle
+import sys
 
 def svm_loss_naive(W, X, y, reg):
   """
@@ -34,13 +35,19 @@ def svm_loss_naive(W, X, y, reg):
       margin = scores[j] - correct_class_score + 1 # note delta = 1
       if margin > 0:
         loss += margin
+        # print X[i,:].T.shape, dW[:,y[i]].shape
+        # sys.exit(0)  
+        dW[:,y[i]] -= X[i,:].T
+        dW[:,j] += X[i,:].T
 
   # Right now the loss is a sum over all training examples, but we want it
   # to be an average instead so we divide by num_train.
   loss /= num_train
+  dW /= num_train
 
   # Add regularization to the loss.
   loss += 0.5 * reg * np.sum(W * W)
+  dW += reg * W
 
   #############################################################################
   # TODO:                                                                     #
@@ -63,13 +70,54 @@ def svm_loss_vectorized(W, X, y, reg):
   """
   loss = 0.0
   dW = np.zeros(W.shape) # initialize the gradient as zero
+  num_classes = W.shape[1]
+  
+  # print X.shape, W.shape
+  # scores = W.T.dot(X.T)
+  scores = X.dot(W)
+  true_scores = scores[np.arange(0, scores.shape[0]),y]
+  # correct_class_scores =  * scores[np.arange(0, scores.shape[0]),y]
+  correct_class_scores = np.tile(true_scores,(10,1)).T
+  # print correct_class_scores.shape
+  # scores[np.arange(0, scores.shape[0]),y] = 0
+  deltas = np.ones(scores.shape)
+  # print scores.shape, correct_class_scores.shape, deltas.shape 
+  # sys.exit(0)
+  loss = scores - correct_class_scores + deltas
 
+  loss[np.arange(0, scores.shape[0]),y] = 0.0
+  
+  loss[loss < 0] = 0.0
+
+  overall_loss = float(np.sum(loss))/X.shape[0]
+  overall_loss += 0.5 * reg * np.sum(W * W)
+
+
+
+  # dW = np.ones(loss.shape)
+  dW = np.ones(loss.shape)
+  dW[loss <=0  ] = 0
+  dW[np.arange(scores.shape[0]),y] = -1 * np.sum(dW, axis=1)
+  dW = X.T.dot(dW)
+  # #dW = np.dot(X.T, dW)
+  # #dW /= X.shape[0]
+  # dLds = np.ones_like(loss)
+  # dLds[loss<=0] = 0
+  # dLds[np.arange(loss.shape[0]), y] = -dLds.sum(axis=1)
+  # dLds /= float(X.shape[0])
+  # dW = np.dot(X.T, dLds)
+  # dW = np.dot(X.T, dLds)
+  # #  
+  # dW = X.T.dot(loss - np.reshape(np.sum(loss,axis = 1),(-1,1)) * (tmp == 1))
+  dW /= float(X.shape[0]) 
+
+  dW += reg * W
   #############################################################################
   # TODO:                                                                     #
   # Implement a vectorized version of the structured SVM loss, storing the    #
   # result in loss.                                                           #
   #############################################################################
-  pass
+  # pass
   #############################################################################
   #                             END OF YOUR CODE                              #
   #############################################################################
@@ -84,9 +132,9 @@ def svm_loss_vectorized(W, X, y, reg):
   # to reuse some of the intermediate values that you used to compute the     #
   # loss.                                                                     #
   #############################################################################
-  pass
+  # pass
   #############################################################################
   #                             END OF YOUR CODE                              #
   #############################################################################
 
-  return loss, dW
+  return overall_loss, dW
