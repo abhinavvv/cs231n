@@ -121,8 +121,8 @@ class KNearestNeighbor(object):
     X_train2 = X_train2.reshape(X_train2.shape[0],1)
     X2new = X2.dot(np.ones((1,self.X_train.shape[0])))
     X_train2new = np.ones((X.shape[0],1)).dot(X_train2.T)
-    print "Intermediate Test data dimensions :", X2new.shape
-    print "Intermediate Training dimensions :", X_train2new.shape
+    # print "Intermediate Test data dimensions :", X2new.shape
+    # print "Intermediate Training dimensions :", X_train2new.shape
     dists = np.sqrt(X2new + X_train2new - (2 * X.dot(self.X_train.T)))
     #########################################################################
     # TODO:                                                                 #
