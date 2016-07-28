@@ -1,5 +1,6 @@
 import numpy as np
 import sys
+from operator import mul
 
 def affine_forward(x, w, b):
   """
@@ -20,15 +21,15 @@ def affine_forward(x, w, b):
   - cache: (x, w, b)
   """
   out = None
-  from operator import mul
+  
   #############################################################################
   # TODO: Implement the affine forward pass. Store the result in out. You     #
   # will need to reshape the input into rows.                                 #
   #############################################################################
-  print x.shape
-  x = np.reshape(x,(x.shape[0],reduce(mul,x.shape[1:],1)))
-  print "new shape of x",x.shape
-  out = x.dot(w) + b
+  
+  new_x = np.reshape(x,(x.shape[0],reduce(mul,x.shape[1:],1)))
+  
+  out = new_x.dot(w) + b
   #############################################################################
   #                             END OF YOUR CODE                              #
   #############################################################################
@@ -56,11 +57,14 @@ def affine_backward(dout, cache):
   #############################################################################
   # TODO: Implement the affine backward pass.                                 #
   #############################################################################
-  dw = dout.dot(w.T).reshape(x.shape)
-  print dout.shape
-  print w.shape
-  print dw.shape
-  sys.exit(0)
+  
+  dx = dout.dot(w.T).reshape(x.shape)
+
+  dw = np.reshape(x,(x.shape[0],reduce(mul,x.shape[1:],1))).T.dot(dout)
+
+  db = np.sum(dout,axis=0)
+  
+  
   #############################################################################
   #                             END OF YOUR CODE                              #
   #############################################################################
@@ -82,7 +86,10 @@ def relu_forward(x):
   #############################################################################
   # TODO: Implement the ReLU forward pass.                                    #
   #############################################################################
-  pass
+  x_indices = x < 0
+  out = x
+  out[x_indices] = 0
+  # out = x*(x < 0)
   #############################################################################
   #                             END OF YOUR CODE                              #
   #############################################################################
@@ -105,7 +112,9 @@ def relu_backward(dout, cache):
   #############################################################################
   # TODO: Implement the ReLU backward pass.                                   #
   #############################################################################
-  pass
+  
+  dx = dout*(x>=0)
+  print dx.shape
   #############################################################################
   #                             END OF YOUR CODE                              #
   #############################################################################
