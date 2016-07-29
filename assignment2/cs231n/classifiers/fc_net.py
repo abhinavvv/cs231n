@@ -36,6 +36,8 @@ class TwoLayerNet(object):
     """
     self.params = {}
     self.reg = reg
+
+
     
     ############################################################################
     # TODO: Initialize the weights and biases of the two-layer net. Weights    #
@@ -45,7 +47,11 @@ class TwoLayerNet(object):
     # weights and biases using the keys 'W1' and 'b1' and second layer weights #
     # and biases using the keys 'W2' and 'b2'.                                 #
     ############################################################################
-    pass
+    self.params["W1"] = np.random.normal(scale=weight_scale,size=(input_dim, hidden_dim))
+    self.params["b1"] = np.zeros(hidden_dim)
+
+    self.params["W2"] = np.random.normal(scale=weight_scale,size=(hidden_dim, num_classes))
+    self.params["b2"] = np.zeros(num_classes)
     ############################################################################
     #                             END OF YOUR CODE                             #
     ############################################################################
@@ -75,7 +81,16 @@ class TwoLayerNet(object):
     # TODO: Implement the forward pass for the two-layer net, computing the    #
     # class scores for X and storing them in the scores variable.              #
     ############################################################################
-    pass
+    print "X shape = {} , Weights = {} and bias = {}".format(X.shape,self.params["W1"].shape,self.params["b1"].shape)
+
+    fwd_out,cache_fwd_out = affine_forward(X,self.params["W1"],self.params["b1"])
+    print "The shape after forward pass = ",fwd_out.shape
+    
+    relu_out,cache_relu_out = relu_forward(fwd_out)
+    
+    scores,score_cache = affine_forward(relu_out,self.params["W2"],self.params["b2"])
+    # print scores
+
     ############################################################################
     #                             END OF YOUR CODE                             #
     ############################################################################
@@ -95,7 +110,9 @@ class TwoLayerNet(object):
     # automated tests, make sure that your L2 regularization includes a factor #
     # of 0.5 to simplify the expression for the gradient.                      #
     ############################################################################
-    pass
+    inter_pass1,_,_ = affine_backward(scores,score_cache)
+    inter_pass2 = relu_backward(inter_pass1,cache_relu_out)
+    loss,_,_ = affine_backward(inter_pass2,score_cache)
     ############################################################################
     #                             END OF YOUR CODE                             #
     ############################################################################
